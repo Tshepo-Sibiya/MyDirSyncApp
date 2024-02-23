@@ -10,12 +10,12 @@ namespace MyDirSyncApp
         private string destinationDirectory;
         private bool includeSubdirectories;
         private bool doNotDelete;
+
         public MainForm()
         {
             InitializeComponent();
             LoadSettings();
         }
-
 
         private void LoadSettings()
         {
@@ -23,66 +23,13 @@ namespace MyDirSyncApp
             txtDestination.Text = Properties.Settings.Default.DestinationDirectory;
             checkBoxIncludeSubDir.Checked = Properties.Settings.Default.IncludeSubdirectories;
             checkBoxDoNotDelete.Checked = Properties.Settings.Default.DoNotDelete;
-
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void btnBrowseSource_Click(object sender, EventArgs e)
-        {
-            using (var folderDialog = new FolderBrowserDialog())
-            {
-                DialogResult result = folderDialog.ShowDialog();
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderDialog.SelectedPath))
-                {
-                    txtSource.Text = folderDialog.SelectedPath;
-                }
-            }
-
-        }
-
-        private void btnViewLog_Click(object sender, EventArgs e)
-        {
-            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReplicationLog.txt");
-            if (File.Exists(logFile))
-            {
-                System.Diagnostics.Process.Start("notepad.exe", logFile);
-            }
-            else
-            {
-                MessageBox.Show("Log file not found.");
-            }
-        }
-
-        private void btnBrowseDestination_Click(object sender, EventArgs e)
-        {
-            using (var folderDialog = new FolderBrowserDialog())
-            {
-                DialogResult result = folderDialog.ShowDialog();
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderDialog.SelectedPath))
-                {
-                    txtDestination.Text = folderDialog.SelectedPath;
-                }
-            }
-        }
-
-        private void btnExit_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void Log(string message)
-        {
-            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReplicationLog.txt");
-            using (StreamWriter writer = new StreamWriter(logFile, true))
-            {
-                writer.WriteLine($"{DateTime.Now} - {message}");
-            }
-        }
-
+        private void button1_Click(object sender, EventArgs e) => Application.Exit();
+        private void btnBrowseSource_Click(object sender, EventArgs e) => SelectFolder(txtSource);
+        private void btnViewLog_Click(object sender, EventArgs e) => OpenLogFile();
+        private void btnBrowseDestination_Click(object sender, EventArgs e) => SelectFolder(txtDestination);
+        private void btnExit_Click(object sender, EventArgs e) => Application.Exit();
+        private void Log(string message) => File.AppendAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReplicationLog.txt"), $"{DateTime.Now} - {message}\n");
         private void btnReplicate_Click(object sender, EventArgs e)
         {
             sourceDirectory = txtSource.Text;
@@ -90,12 +37,7 @@ namespace MyDirSyncApp
             includeSubdirectories = checkBoxIncludeSubDir.Checked;
             doNotDelete = checkBoxDoNotDelete.Checked;
 
-
-            Properties.Settings.Default.SourceDirectory = sourceDirectory;
-            Properties.Settings.Default.DestinationDirectory = destinationDirectory;
-            Properties.Settings.Default.IncludeSubdirectories = includeSubdirectories;
-            Properties.Settings.Default.DoNotDelete = doNotDelete;
-            Properties.Settings.Default.Save();
+            SaveSettings();
 
             if (string.IsNullOrWhiteSpace(sourceDirectory) || string.IsNullOrWhiteSpace(destinationDirectory))
             {
@@ -113,6 +55,7 @@ namespace MyDirSyncApp
             {
                 Directory.CreateDirectory(destinationDirectory);
             }
+
             Log("Starting replication process..");
             progressBar1.Value = 0;
             ReplicateDirectories(sourceDirectory, destinationDirectory);
@@ -122,9 +65,7 @@ namespace MyDirSyncApp
 
         private void ReplicateDirectories(string sourceDir, string destinationDir)
         {
-            string[] files = Directory.GetFiles(sourceDir);
-
-            foreach (string file in files)
+            foreach (string file in Directory.GetFiles(sourceDir))
             {
                 string destFile = Path.Combine(destinationDir, Path.GetFileName(file));
                 FileInfo sourceFileInfo = new FileInfo(file);
@@ -136,14 +77,12 @@ namespace MyDirSyncApp
                     Log($"Copied: {file} to {destFile}");
                 }
 
-                progressBar1.Value = (int)(((double)progressBar1.Value / files.Length) * 100);
+                progressBar1.Value++;
             }
 
             if (includeSubdirectories)
             {
-                string[] subDirectories = Directory.GetDirectories(sourceDir);
-
-                foreach (string subDir in subDirectories)
+                foreach (string subDir in Directory.GetDirectories(sourceDir))
                 {
                     string destSubDir = Path.Combine(destinationDir, Path.GetFileName(subDir));
                     if (!Directory.Exists(destSubDir))
@@ -157,9 +96,7 @@ namespace MyDirSyncApp
 
             if (!doNotDelete)
             {
-                string[] destFiles = Directory.GetFiles(destinationDir);
-
-                foreach (string destFile in destFiles)
+                foreach (string destFile in Directory.GetFiles(destinationDir))
                 {
                     string srcFile = Path.Combine(sourceDir, Path.GetFileName(destFile));
 
@@ -169,14 +106,12 @@ namespace MyDirSyncApp
                         Log($"Deleted: {destFile}");
                     }
 
-                    progressBar1.Value = (int)(((double)progressBar1.Value / destFiles.Length) * 100);
+                    progressBar1.Value++;
                 }
 
                 if (includeSubdirectories)
                 {
-                    string[] destSubDirectories = Directory.GetDirectories(destinationDir);
-
-                    foreach (string destSubDir in destSubDirectories)
+                    foreach (string destSubDir in Directory.GetDirectories(destinationDir))
                     {
                         string srcSubDir = Path.Combine(sourceDir, Path.GetFileName(destSubDir));
 
@@ -186,10 +121,44 @@ namespace MyDirSyncApp
                             Log($"Deleted Directory: {destSubDir}");
                         }
 
-                        progressBar1.Value = (int)(((double)progressBar1.Value / destSubDirectories.Length) * 100);
+                        progressBar1.Value++;
                     }
                 }
             }
+        }
+
+        private void SelectFolder(TextBox textBox)
+        {
+            using (var folderDialog = new FolderBrowserDialog())
+            {
+                DialogResult result = folderDialog.ShowDialog();
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderDialog.SelectedPath))
+                {
+                    textBox.Text = folderDialog.SelectedPath;
+                }
+            }
+        }
+
+        private void OpenLogFile()
+        {
+            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReplicationLog.txt");
+            if (File.Exists(logFile))
+            {
+                System.Diagnostics.Process.Start("notepad.exe", logFile);
+            }
+            else
+            {
+                MessageBox.Show("Log file not found.");
+            }
+        }
+
+        private void SaveSettings()
+        {
+            Properties.Settings.Default.SourceDirectory = sourceDirectory;
+            Properties.Settings.Default.DestinationDirectory = destinationDirectory;
+            Properties.Settings.Default.IncludeSubdirectories = includeSubdirectories;
+            Properties.Settings.Default.DoNotDelete = doNotDelete;
+            Properties.Settings.Default.Save();
         }
     }
 }
