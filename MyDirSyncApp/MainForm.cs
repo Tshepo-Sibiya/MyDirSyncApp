@@ -22,7 +22,7 @@ namespace MyDirSyncApp
             txtSource.Text = Properties.Settings.Default.SourceDirectory;
             txtDestination.Text = Properties.Settings.Default.DestinationDirectory;
             checkBoxIncludeSubDir.Checked = Properties.Settings.Default.IncludeSubdirectories;
-            progressBar1.Value = 5;
+            checkBoxDoNotDelete.Checked = Properties.Settings.Default.DoNotDelete;
 
         }
 
@@ -88,11 +88,13 @@ namespace MyDirSyncApp
             sourceDirectory = txtSource.Text;
             destinationDirectory = txtDestination.Text;
             includeSubdirectories = checkBoxIncludeSubDir.Checked;
+            doNotDelete = checkBoxDoNotDelete.Checked;
 
 
             Properties.Settings.Default.SourceDirectory = sourceDirectory;
             Properties.Settings.Default.DestinationDirectory = destinationDirectory;
             Properties.Settings.Default.IncludeSubdirectories = includeSubdirectories;
+            Properties.Settings.Default.DoNotDelete = doNotDelete;
             Properties.Settings.Default.Save();
 
             if (string.IsNullOrWhiteSpace(sourceDirectory) || string.IsNullOrWhiteSpace(destinationDirectory))

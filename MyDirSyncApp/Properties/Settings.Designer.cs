@@ -58,5 +58,17 @@ namespace MyDirSyncApp.Properties {
                 this["IncludeSubdirectories"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DoNotDelete {
+            get {
+                return ((bool)(this["DoNotDelete"]));
+            }
+            set {
+                this["DoNotDelete"] = value;
+            }
+        }
     }
 }

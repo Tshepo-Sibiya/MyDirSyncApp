@@ -42,6 +42,7 @@ namespace MyDirSyncApp
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
             this.btnExit = new System.Windows.Forms.Button();
+            this.checkBoxDoNotDelete = new System.Windows.Forms.CheckBox();
             btnBrowseDestination = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -78,6 +79,7 @@ namespace MyDirSyncApp
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.checkBoxDoNotDelete);
             this.panel1.Controls.Add(this.checkBoxIncludeSubDir);
             this.panel1.Controls.Add(btnBrowseDestination);
             this.panel1.Controls.Add(this.btnBrowseSource);
@@ -132,7 +134,7 @@ namespace MyDirSyncApp
             // 
             // btnReplicate
             // 
-            this.btnReplicate.Location = new System.Drawing.Point(161, 285);
+            this.btnReplicate.Location = new System.Drawing.Point(161, 322);
             this.btnReplicate.Name = "btnReplicate";
             this.btnReplicate.Size = new System.Drawing.Size(112, 34);
             this.btnReplicate.TabIndex = 7;
@@ -177,6 +179,17 @@ namespace MyDirSyncApp
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // checkBoxDoNotDelete
+            // 
+            this.checkBoxDoNotDelete.AutoSize = true;
+            this.checkBoxDoNotDelete.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.checkBoxDoNotDelete.Location = new System.Drawing.Point(161, 265);
+            this.checkBoxDoNotDelete.Name = "checkBoxDoNotDelete";
+            this.checkBoxDoNotDelete.Size = new System.Drawing.Size(154, 29);
+            this.checkBoxDoNotDelete.TabIndex = 14;
+            this.checkBoxDoNotDelete.Text = "Do not delete";
+            this.checkBoxDoNotDelete.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -206,6 +219,7 @@ namespace MyDirSyncApp
         private System.Windows.Forms.Button btnBrowseSource;
         private System.Windows.Forms.TextBox txtDestination;
         private System.Windows.Forms.CheckBox checkBoxIncludeSubDir;
+        private System.Windows.Forms.CheckBox checkBoxDoNotDelete;
     }
 }
 
